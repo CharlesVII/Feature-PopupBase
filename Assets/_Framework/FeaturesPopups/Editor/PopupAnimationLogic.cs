@@ -236,18 +236,28 @@ namespace Features.Popups.EditorTools
         // =========================================================
         // SYNC + HELPERS
         // =========================================================
-        private static List<Type> GetAllAnimationTypes(bool isShow)
+        public List<Type> GetAllAnimationTypes(bool isShow)
         {
-            var table = Resources.Load<PopupAnimationScriptTable>("PopupAnimationScriptTable");
-            if (table == null || table.Equals(null))
+            var result = new List<Type>();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var asm in assemblies)
             {
-                Debug.LogWarning("⚠️ Missing PopupAnimationScriptTable in Resources/");
-                return new List<Type>();
+                foreach (var type in asm.GetTypes())
+                {
+                    if (!typeof(MonoBehaviour).IsAssignableFrom(type) || type.IsAbstract)
+                        continue;
+
+                    // lọc các class animation có interface Show / Hide
+                    bool isShowType = typeof(IShowPhase).IsAssignableFrom(type);
+                    bool isHideType = typeof(IHidePhase).IsAssignableFrom(type);
+
+                    if ((isShow && isShowType) || (!isShow && isHideType))
+                        result.Add(type);
+                }
             }
-
-            return table.GetAnimationTypes(isShow);
+            return result;
         }
-
         private MonoBehaviour FindParentSequence(Transform current, bool isShow, MonoBehaviour popupBase)
         {
             MonoBehaviour seq = null;
@@ -281,7 +291,7 @@ namespace Features.Popups.EditorTools
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
-                if (node == target)
+                if ((UnityEngine.Object)node == target)
                 {
                     nodes.RemoveAt(i);
                     return true;
@@ -386,7 +396,7 @@ namespace Features.Popups.EditorTools
 
             for (int i = 0; i < nodes.Count; i++)
             {
-                if (nodes[i] == comp)
+                if ((UnityEngine.Object)nodes[i] == comp)
                 {
                     nodes.RemoveAt(i);
                     return true;
@@ -592,6 +602,107 @@ namespace Features.Popups.EditorTools
             return false;
         }
 
+        // =========================================================
+        // REPLACE ANIMATION
+        // =========================================================
+        public void ReplaceAnimation(MonoBehaviour oldAnim, Type newType, bool isShow)
+        {
+            if (oldAnim == null || newType == null)
+            {
+                Debug.LogWarning("⚠️ Invalid target animation replacement. The old animation is null or destroyed.");
+                return;
+            }
+
+            if (oldAnim.Equals(null)) // Kiểm tra nếu đối tượng đã bị hủy
+            {
+                Debug.LogWarning("⚠️ The old animation has been destroyed. Cannot replace.");
+                return;
+            }
+
+            var target = oldAnim.transform;
+            var popupBase = FindPopupBase(target);
+            if (popupBase == null)
+            {
+                Debug.LogWarning("⚠️ PopupBase not found for replacement.");
+                return;
+            }
+
+            // Tìm sequence gốc
+            var popupType = popupBase.GetType();
+            var seqField = popupType.GetField(isShow ? "showSequence" : "hideSequence", BindingFlags.NonPublic | BindingFlags.Instance);
+            var rootSeq = seqField?.GetValue(popupBase);
+            if (rootSeq == null)
+            {
+                Debug.LogWarning("⚠️ Root sequence not found.");
+                return;
+            }
+
+            // Tìm parent chứa animation cũ
+            var parentSeq = FindSequenceContainingNode(rootSeq, oldAnim);
+            if (parentSeq == null)
+            {
+                Debug.LogWarning("⚠️ Cannot find parent sequence for replacement.");
+                return;
+            }
+
+            // Xóa node cũ trong parent
+            var nodesField = parentSeq.GetType().GetField("nodes", BindingFlags.NonPublic | BindingFlags.Instance);
+            var nodes = nodesField?.GetValue(parentSeq) as IList;
+            if (nodes != null)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if ((UnityEngine.Object)nodes[i] == oldAnim)
+                    {
+                        nodes.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
+            // Xóa component cũ
+            Undo.DestroyObjectImmediate(oldAnim);
+
+            // Thêm component mới
+            var newComp = Undo.AddComponent(target.gameObject, newType) as MonoBehaviour;
+            (newComp as IAnimationInitializable)?.Initialize(target);
+
+            // Add node mới
+            var addNode = parentSeq.GetType().GetMethod("AddNode", new Type[] { typeof(MonoBehaviour) });
+            addNode?.Invoke(parentSeq, new object[] { newComp });
+
+            Debug.Log($"🔁 Replaced animation '{oldAnim.GetType().Name}' → {newType.Name} ({(isShow ? "Show" : "Hide")})");
+
+            MarkDirtyAll(popupBase, parentSeq, newComp);
+            AssetDatabase.SaveAssets();
+            EditorWindow.GetWindow<PopupAnimationWindow>()?.Repaint();
+        }
+
+        private MonoBehaviour FindSequenceContainingNode(object sequence, MonoBehaviour target)
+        {
+            if (sequence == null || target == null) return null;
+            var nodesField = sequence.GetType().GetField("nodes", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (nodesField == null) return null;
+
+            var nodes = nodesField.GetValue(sequence) as IList;
+            if (nodes == null) return null;
+
+            foreach (var node in nodes)
+            {
+                if ((UnityEngine.Object)node == target)
+                    return sequence as MonoBehaviour;
+
+                if (node is MonoBehaviour sub && (sub is PopupShowSequence || sub is PopupHideSequence))
+                {
+                    var found = FindSequenceContainingNode(sub, target);
+                    if (found != null)
+                        return found;
+                }
+            }
+            return null;
+        }
+
+   
     }
 }
 #endif

@@ -29,7 +29,7 @@ namespace Features.Popups
         {
             PopupDebugLogger.Log("[PopupBase] InternalShowAsync bắt đầu.");
 
-            await SetupOnBefoStart();
+            await SetupOnBeforeShow();
             showSequence.PreAnimation();
             await showSequence.PlayAsync();
             showSequence.AfterAnimation();
@@ -62,7 +62,7 @@ namespace Features.Popups
             PopupDebugLogger.Log("[PopupBase] InternalHideAsync hoàn thành.");
         }
 
-        protected virtual UniTask SetupOnBefoStart() => UniTask.CompletedTask;
+        protected virtual UniTask SetupOnBeforeShow() => UniTask.CompletedTask;
         protected virtual UniTask OnShowCompleted() => UniTask.CompletedTask;
         protected virtual UniTask SetupOnBeforHide() => UniTask.CompletedTask;
         protected virtual UniTask OnHideComplete() => UniTask.CompletedTask;

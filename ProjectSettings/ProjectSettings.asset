@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: 327acdea03095554e971e7a0cbc53ab3
+  productGUID: 4716a81b21c208a4987660e77b68a886
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: FeaturesPopup
+  productName: Feature_Popup
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -823,7 +823,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: DOTWEEN;UNITASK_DOTWEEN_SUPPORT
+    Android: DOTWEEN
     EmbeddedLinux: DOTWEEN
     GameCoreScarlett: DOTWEEN
     GameCoreXboxOne: DOTWEEN
@@ -834,7 +834,7 @@ PlayerSettings:
     PS4: DOTWEEN
     PS5: DOTWEEN
     QNX: DOTWEEN
-    Standalone: DOTWEEN;UNITASK_DOTWEEN_SUPPORT
+    Standalone: UNITASK_DOTWEEN_SUPPORT;DOTWEEN
     VisionOS: DOTWEEN
     WebGL: DOTWEEN
     Windows Store Apps: DOTWEEN
@@ -861,14 +861,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: FeaturesPopup
+  metroPackageName: Feature_Popup
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: FeaturesPopup
+  metroApplicationDescription: Feature_Popup
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
@@ -939,10 +939,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: e52e38ec-d4d1-410e-a1e5-eb7af0f08070
+  cloudProjectId: ec133a0a-7270-4936-bfe8-a1258ac75651
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: FeaturesPopup
+  projectName: Feature_Popup
   organizationId: letuong2503
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

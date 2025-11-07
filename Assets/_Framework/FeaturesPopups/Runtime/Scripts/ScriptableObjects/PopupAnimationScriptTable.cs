@@ -63,7 +63,7 @@ namespace Features.Popups
                 {
                     sequenceEntries.Add(new SequenceEntry
                     {
-                        displayName = type.Name,
+                        displayName = type.Name.Replace("PopupAnim", ""), // Loại bỏ tiền tố "PopupAnim"
                         script = script
                     });
                 }
@@ -75,7 +75,7 @@ namespace Features.Popups
                 {
                     animationEntries.Add(new AnimationEntry
                     {
-                        displayName = type.Name,
+                        displayName = type.Name.Replace("PopupAnim", ""), // Loại bỏ tiền tố "PopupAnim"
                         script = script
                     });
                 }
@@ -83,7 +83,6 @@ namespace Features.Popups
 
             Debug.Log($"✅ Synced {animationEntries.Count} Anim + {sequenceEntries.Count} Seq scripts.");
         }
-
 #endif
     }
 

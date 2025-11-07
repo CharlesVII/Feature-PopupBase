@@ -69,10 +69,35 @@ namespace Features.Popups.EditorTools
                 logic.ShowAddMenu(go.transform, false);
 
             // ----------------------
+            // 🔁 Change Animation
+            // ----------------------
+            GUI.backgroundColor = new Color(0.6f, 0.6f, 1f);
+            if (GUI.Button(new Rect(startX + (btnWidth + spacing) * 4, y, btnWidth, h), "Ch", mini))
+            {
+                var goComp = go.GetComponent<MonoBehaviour>();
+                if (goComp != null)
+                {
+                    GenericMenu menu = new GenericMenu();
+                    bool isShow = goComp is IShowPhase;
+                    var allAnim = logic.GetAllAnimationTypes(isShow);
+                    foreach (var type in allAnim)
+                    {
+                        if (type == goComp.GetType()) continue;
+                        menu.AddItem(new GUIContent(type.Name), false, () =>
+                        {
+                            logic.ReplaceAnimation(goComp, type, isShow);
+                            EditorWindow.GetWindow<PopupAnimationWindow>()?.Repaint();
+                        });
+                    }
+                    menu.ShowAsContext();
+                }
+            }
+
+            // ----------------------
             // 🗑 Remove All
             // ----------------------
             GUI.backgroundColor = new Color(1f, 0.4f, 0.4f);
-            if (GUI.Button(new Rect(startX + (btnWidth + spacing) * 4, y, btnWidth, h), "✕", mini))
+            if (GUI.Button(new Rect(startX + (btnWidth + spacing) * 5, y, btnWidth, h), "✕", mini))
             {
                 if (EditorUtility.DisplayDialog(
                     "Remove All Animations",

@@ -11,11 +11,11 @@ namespace Features.Popups
       where TPhase : IAnimationPhase
     {
         [Header("Sequence Settings")]
-        public bool runSequentially = true;
-        public float delayBefore = 0f;
-        public float delayBetween = 0f;
-        public float delayAfter = 0f;
-        public List<MonoBehaviour> nodes = new();
+        [SerializeField] protected bool runSequentially = true;
+        [SerializeField] protected float delayBefore = 0f;
+        [SerializeField] protected float delayBetween = 0f;
+        [SerializeField] protected float delayAfter = 0f;
+        [SerializeField] protected List<MonoBehaviour> nodes = new();
 
         protected virtual IEnumerable<MonoBehaviour> OrderedNodes => nodes;
 

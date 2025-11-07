@@ -9,7 +9,7 @@ namespace Features.Popups
     public class PopupHideSequence : PopupAnimationSequenceBase<IHidePhase>
     {
         [Tooltip("Nếu bật, các node sẽ chạy theo thứ tự đảo ngược (child → root).")]
-        public bool reverseOrder = true;
+        [SerializeField] private bool reverseOrder = true;
 
         protected override IEnumerable<MonoBehaviour> OrderedNodes
             => reverseOrder ? nodes.AsEnumerable().Reverse() : nodes;
